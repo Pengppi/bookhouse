@@ -11,6 +11,12 @@ public class Code extends Model<Code>{
 	
 	private Long bookId;
 	
+	@Override
+	public String toString() {
+		return "Code [codeId=" + codeId + ", bookId=" + bookId + ", codeType=" + codeType + ", codeContent="
+				+ codeContent + ", codeStart=" + codeStart + ", codeEnd=" + codeEnd + ", codeState=" + codeState + "]";
+	}
+
 	private Short codeType;
 	
 	private String codeContent;
