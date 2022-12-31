@@ -12,7 +12,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Book extends Model<Book> {
     
-    private String bookId;
+    private Long bookId;
     
     private String userId;
     
@@ -31,11 +31,11 @@ public class Book extends Model<Book> {
     private String bookBoorow;
 
 
-    public String getBookId() {
+    public Long getBookId() {
         return bookId;
     }
 
-    public void setBookId(String bookId) {
+    public void setBookId(Long bookId) {
         this.bookId = bookId;
     }
 
