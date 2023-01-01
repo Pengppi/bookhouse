@@ -12,7 +12,7 @@ import com.neo.bookhouse.mapper.UserMapper;
 import com.neo.bookhouse.service.UserService;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("userService")
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
 }

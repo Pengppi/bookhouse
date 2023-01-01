@@ -12,7 +12,7 @@ import com.neo.bookhouse.mapper.BookMapper;
 import com.neo.bookhouse.service.BookService;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("bookService")
 public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements BookService {
 
 
