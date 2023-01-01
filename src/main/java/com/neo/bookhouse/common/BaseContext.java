@@ -1,10 +1,4 @@
-/**
- * @Author: Neo
- * @Date: 2022/12/05 星期一 19:34:27
- * @Project: javaweb_homework
- * @IDE: IntelliJ IDEA
- **/
-package homework.ultimatemall.common;
+package com.neo.bookhouse.common;
 
 /**
  * 基于ThreadLocal封装工具类，用户保存和获取当前登录用户id
