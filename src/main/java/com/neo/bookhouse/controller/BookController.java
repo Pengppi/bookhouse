@@ -61,7 +61,7 @@ public class BookController {
     	return R.success("修改成功");
      }
     
-    @GetMapping("/findAll/{id}")//查询书屋的信息
+    @GetMapping("/findAll/{id}")//查询书屋的信息("userId")
     public R<List<Book>> getBookByUserId(@PathVariable Long id)//路径变量
     {
     	LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
