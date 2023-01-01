@@ -16,7 +16,7 @@ import lombok.Data;
 public class Code extends Model<Code>{
     
 	//BigDecimal
-	@TableId
+	@TableId(type = IdType.AUTO)
 	private Long codeId;
 	
 	private Long bookId;

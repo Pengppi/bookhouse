@@ -1,7 +1,12 @@
 package com.neo.bookhouse.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+
+import lombok.Data;
 
 import java.io.Serializable;
 
@@ -12,8 +17,11 @@ import java.io.Serializable;
  * @since 2022-08-25 23:55:01
  */
 @SuppressWarnings("serial")
+@Data
+@TableName("user")
 public class User extends Model<User> {
 
+	@TableId(type = IdType.AUTO)//主键自增
     private String userId;
 
     private String userPassword;
