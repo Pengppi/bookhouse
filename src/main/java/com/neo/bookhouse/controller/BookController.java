@@ -39,7 +39,7 @@ public class BookController {
         log.info("添加书籍：{}", book);
         //String userId = request.getAttribute("userId").toString();
         //book.setUserId(userId);
-        book.setUserId("1");
+        book.setUserId(1L);
         boolean flg = bookService.save(book);
         if (flg) {
             return R.success("添加成功");

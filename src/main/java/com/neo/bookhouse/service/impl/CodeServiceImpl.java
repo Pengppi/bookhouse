@@ -7,7 +7,7 @@ import com.neo.bookhouse.entity.Code;
 import com.neo.bookhouse.mapper.CodeMapper;
 import com.neo.bookhouse.service.CodeService;
 
-@Service("codeService")
+@Service
 public class CodeServiceImpl extends ServiceImpl<CodeMapper, Code> implements  CodeService{
 
 }

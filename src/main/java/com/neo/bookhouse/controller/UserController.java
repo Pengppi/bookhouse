@@ -65,9 +65,6 @@ public class UserController {
 
     @PostMapping("/register")//用户信息：注册账号信息
     public R<String> register(@RequestBody User user) {
-        if (user.getUserId().trim().length() == 0) {
-            return R.error("账号不能为空");
-        }
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getUserId, user.getUserId());
         User one = userService.getOne(queryWrapper);
