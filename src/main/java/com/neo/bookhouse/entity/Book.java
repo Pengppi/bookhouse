@@ -1,6 +1,11 @@
 package com.neo.bookhouse.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
@@ -10,8 +15,11 @@ import java.io.Serializable;
  * @since 2022-09-01 14:11:51
  */
 @SuppressWarnings("serial")
+@Data
+@TableName("book")
 public class Book extends Model<Book> {
     
+	@TableId
     private Long bookId;
     
     private String userId;
