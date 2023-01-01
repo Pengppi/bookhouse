@@ -1,27 +1,35 @@
 package com.neo.bookhouse.entity;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 
+import lombok.Data;
+
 @SuppressWarnings("serial")
+@Data
+@TableName("code")
 public class Code extends Model<Code>{
-   
+    
+	//BigDecimal
+	@TableId
 	private Long codeId;
 	
 	private Long bookId;
-	
-	@Override
-	public String toString() {
-		return "Code [codeId=" + codeId + ", bookId=" + bookId + ", codeType=" + codeType + ", codeContent="
-				+ codeContent + ", codeStart=" + codeStart + ", codeEnd=" + codeEnd + ", codeState=" + codeState + "]";
-	}
 
-	private Short codeType;
+	private Integer codeType;
 	
 	private String codeContent;
 	
-	private Date codeStart;
+	private LocalDateTime codeStart;
+	
+    private LocalDateTime codeEnd;
+	
+	private Integer codeState;
 	
 	public Long getCodeId() {
 		return codeId;
@@ -39,11 +47,11 @@ public class Code extends Model<Code>{
 		this.bookId = bookId;
 	}
 
-	public Short getCodeType() {
+	public Integer getCodeType() {
 		return codeType;
 	}
 
-	public void setCodeType(Short codeType) {
+	public void setCodeType(Integer codeType) {
 		this.codeType = codeType;
 	}
 
@@ -55,31 +63,36 @@ public class Code extends Model<Code>{
 		this.codeContent = codeContent;
 	}
 
-	public Date getCodeStart() {
+	public LocalDateTime getCodeStart() {
 		return codeStart;
 	}
 
-	public void setCodeStart(Date codeStart) {
+	public void setCodeStart(LocalDateTime codeStart) {
 		this.codeStart = codeStart;
 	}
 
-	public Date getCodeEnd() {
+	public LocalDateTime getCodeEnd() {
 		return codeEnd;
 	}
 
-	public void setCodeEnd(Date codeEnd) {
+	public void setCodeEnd(LocalDateTime codeEnd) {
 		this.codeEnd = codeEnd;
 	}
 
-	public Short getCodeState() {
+	public Integer getCodeState() {
 		return codeState;
 	}
 
-	public void setCodeState(Short codeState) {
+	public void setCodeState(Integer codeState) {
 		this.codeState = codeState;
 	}
-
-	private Date codeEnd;
 	
-	private Short codeState;
+
+	@Override
+	public String toString() {
+		return "Code [codeId=" + codeId + ", bookId=" + bookId + ", codeType=" + codeType + ", codeContent="
+				+ codeContent + ", codeStart=" + codeStart + ", codeEnd=" + codeEnd + ", codeState=" + codeState + "]";
+	}
+
+	
 }
