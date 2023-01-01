@@ -27,7 +27,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")//用户信息：检查账号是否存在
     public R<String> checkUserId(@PathVariable String id) {
         log.info("id={}", id);
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
@@ -63,7 +63,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/register")
+    @PostMapping("/register")//用户信息：注册账号信息
     public R<String> register(@RequestBody User user) {
         if (user.getUserId().trim().length() == 0) {
             return R.error("账号不能为空");
