@@ -33,7 +33,6 @@ public class ChatController {
     private ChatService chatService;
     @Autowired
     private ContactService contactService;
-
     @Autowired
     private UserService userService;
 
@@ -64,6 +63,18 @@ public class ChatController {
             return R.success("发送成功");
         }
         return R.error("发送失败");
+    }
+
+    @PostMapping("/build")
+    public R<String> build(@RequestParam("userId") Long userId, @RequestParam("receiverId") Long receiverId) {
+        Contact contact = new Contact();
+        contact.setSenderId(userId);
+        contact.setReceiverId(receiverId);
+        contact.setUnreadCount(0);
+        if (contactService.save(contact)) {
+            return R.success("建立联系成功");
+        }
+        return R.error("建立联系失败");
     }
 
 }
