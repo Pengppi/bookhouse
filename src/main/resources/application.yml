@@ -13,3 +13,6 @@ spring:
     password: bnljigdxnthuccda
     default-encoding: UTF-8
 
+bookhouse:
+  imgPath: \src\main\resources\static\img\
+
