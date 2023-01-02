@@ -9,6 +9,7 @@ package com.neo.bookhouse.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.neo.bookhouse.common.R;
 import com.neo.bookhouse.entity.User;
+import com.neo.bookhouse.service.SendMailService;
 import com.neo.bookhouse.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +28,21 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/check/{userName}")
-    public R<String> checkUserName(@PathVariable String userName) {
+    @Autowired
+    private SendMailService sendMailService;
+
+    @GetMapping("/check/{mail}")
+    public R<String> checkUserName(@PathVariable String mail) {
+        if (!sendMailService.isEmail(mail)) {
+            return R.error("邮箱格式错误");
+        }
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getUserName, userName);
+        queryWrapper.eq(User::getUserMail, mail);
         User user = userService.getOne(queryWrapper);
         if (user != null) {
-            return R.error("用户名已存在");
+            return R.error("该邮箱已被注册");
         }
-        return R.success("用户名可用");
+        return R.success("该邮箱可用");
     }
 
     @PostMapping("/login")
@@ -51,6 +58,7 @@ public class UserController {
     public R<String> register(@RequestBody User user) {
         boolean flg = userService.save(user);
         if (flg) {
+            log.info("注册成功：{}", user);
             return R.success("注册成功");
         }
         return R.error("注册失败");
@@ -65,28 +73,5 @@ public class UserController {
         }
         return R.error("修改失败");
     }
-
-
-    public R<String> upload(MultipartFile file) {
-        String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-        String fileName = UUID.randomUUID() + suffix;
-        log.info(fileName);
-        //file.transferTo();
-
-        return R.success("上传成功");
-    }
-
-
-    /**
-     * md5加密
-     *
-     * @param pwd
-     * @return
-     */
-    public String md5(String pwd) {
-        pwd = DigestUtils.md5DigestAsHex(pwd.getBytes());
-        return pwd;
-    }
-
 
 }
