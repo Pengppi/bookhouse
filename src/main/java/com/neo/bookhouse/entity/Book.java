@@ -3,7 +3,10 @@ package com.neo.bookhouse.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * (Book)表实体类
@@ -24,6 +27,8 @@ public class Book {
     private String bookAuthor;
 
     private String bookKind;
+    
+    private String bookTag;
 
     private String bookPhoto;
 
@@ -36,6 +41,7 @@ public class Book {
     private Integer bookQuality;
 
     private Integer bookBorrow;
+    
 
 }
 
