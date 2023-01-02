@@ -52,6 +52,7 @@ public class BookController {
     @DeleteMapping("/delete/{id}")//删除书籍
     public R<String> delete(@PathVariable Long id)//路径变量
     {
+    	log.info("删除{}",id);
         bookService.removeById(id);
         return R.success("删除成功");
     }
