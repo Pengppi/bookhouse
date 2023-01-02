@@ -123,28 +123,6 @@ public class BookController {
     	    	bookTagFunc(booktag, isbn, kind2, 1);
     	    	break;
     	    	}
-    	    
-    	    //确定书籍的种类
-    	    //找出该ISBN号对应的标签数量最大值，并将这些书籍的种类改为该标签
-    	    	//可能删没了。
-    	    booktag = bookTagService.getOne(new LambdaQueryWrapper<Booktag>().orderByDesc(Booktag::getBookSum).last("limit 1"));
-    	    if(booktag != null)
-    	    {
-    	    	System.out.println("booktag:"+isbn+" "+kind2);
-    	    isbn = booktag.getBookIsbn();
-    	    kind2 = booktag.getBookKind();
-    	    LambdaQueryWrapper<Book>wrapper2 = new LambdaQueryWrapper<Book>();
-    	    wrapper2.eq(Book::getBookIsbn, isbn);
-    	    List<Book>books = bookService.list(wrapper2);
-    	    for(Book b : books)
-    	    {
-    	    	Book book2 = new Book();
-    	    	book2.setBookId(b.getBookId());
-    	    	book2.setBookIsbn(isbn);
-    	    	book2.setBookTag(kind2);
-    	    	bookService.updateById(book2);
-    	    }
-    	    }
     	}
     }
     
@@ -244,10 +222,16 @@ public class BookController {
     	Page<Book>pageBuilder = new Page<>(page, pageSize);
     	//查询条件
     	LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
-    	//根据书ID排序，查找和标签相同的书籍
-    	queryWrapper.orderByAsc(Book::getBookId);
     	
-    	queryWrapper.eq(Book::getBookTag, bookTag);
+    	//多层查询语句
+
+        String sql = "select book_isbn from (select book_isbn, Max(book_sum), book_kind from booktag group by book_isbn having book_kind = '"+bookTag+"')as A";
+    	
+    	queryWrapper.inSql(Book::getBookIsbn, sql);
+    
+    	//确定书籍的种类
+	    //找出该对应的标签数量最大的ISBN号
+    	queryWrapper.orderByAsc(Book::getBookId);
     	
     	Page<Book>result = bookService.page(pageBuilder, queryWrapper);
     	

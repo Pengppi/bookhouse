@@ -27,8 +27,6 @@ public class Book {
     private String bookAuthor;
 
     private String bookKind;
-    
-    private String bookTag;
 
     private String bookPhoto;
 
