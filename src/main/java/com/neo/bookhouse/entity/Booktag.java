@@ -13,9 +13,10 @@ public class Booktag {
 
     private String bookIsbn;
 
-    private String bookTag;
-    
+    private String bookKind;
+
     private Integer bookSum;
+
 
 }
 
