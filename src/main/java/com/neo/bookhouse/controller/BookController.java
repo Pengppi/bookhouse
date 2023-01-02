@@ -8,6 +8,7 @@ package com.neo.bookhouse.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.neo.bookhouse.common.BaseContext;
 import com.neo.bookhouse.common.R;
 import com.neo.bookhouse.entity.Book;
@@ -34,6 +35,7 @@ public class BookController {
 
     @Autowired
     BookService bookService;
+    public static final int pageSize = 8; //按标签分页的大小为8
 
     @PostMapping("/add")//新增书籍
     public R<String> add(@RequestBody Book book, HttpServletRequest request) {
@@ -64,6 +66,14 @@ public class BookController {
     	return R.success("修改成功");
      }
     
+    @PostMapping("/cover/{id}")//上传书籍封面("bookId")
+    public R<Book> getBookByBookId(@PathVariable Long id)
+    {
+    	LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
+    	queryWrapper.eq(Book::getBookId, id);
+    	return R.success(bookService.getOne(queryWrapper));
+    }
+    
     @GetMapping("/findAll/{id}")//查询书屋的信息("userId")
     public R<List<Book>> getBookByUserId(@PathVariable Long id)//路径变量
     {
@@ -71,5 +81,31 @@ public class BookController {
     	queryWrapper.eq(Book::getUserId, id);
     	return R.success(bookService.list(queryWrapper));
     }
+    
+    @GetMapping("/findByName/{bookName}")//通过字符串查找书名
+    public R<List<Book>> getBookByName(@PathVariable String bookName)
+    {
+    	LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
+    	queryWrapper.like(Book::getBookName, bookName);
+    	return R.success(bookService.list(queryWrapper));
+    }
+    
+    @GetMapping("/findByTag/{bookTag}/{page}")//通过书籍标签查找书名,参数为标签和页号
+    public R<Page<Book>> getBookByTag(@PathVariable String bookTag, @PathVariable int page)
+    {
+    	//分页构造器
+    	Page<Book>pageBuilder = new Page<>(page, pageSize);
+    	//查询条件
+    	LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
+    	//根据书ID排序，查找和标签相同的书籍
+    	queryWrapper.orderByAsc(Book::getBookId);
+    	
+    	queryWrapper.eq(Book::getBookKind, bookTag);
+    	
+    	Page<Book>result = bookService.page(pageBuilder, queryWrapper);
+    	
+    	return R.success(result);
+    }
+    
 
 }
