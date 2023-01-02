@@ -7,6 +7,7 @@
 package com.neo.bookhouse.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.neo.bookhouse.common.R;
 import com.neo.bookhouse.dto.ContactDto;
 import com.neo.bookhouse.entity.Chat;
@@ -95,6 +96,20 @@ public class ChatController {
             return R.success("删除成功");
         }
         return R.error("删除失败");
+    }
+
+    @PostMapping("/history/{userId}/{anotherId}/{page}/{pageSize}")
+    public R<Page> history(@PathVariable Long userId, @PathVariable Long anotherId, @PathVariable int page, @PathVariable int pageSize) {
+        Page<Chat> pageInfo = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Chat> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Chat::getSenderId, userId);
+        queryWrapper.eq(Chat::getReceiverId, anotherId);
+        queryWrapper.or();
+        queryWrapper.eq(Chat::getSenderId, anotherId);
+        queryWrapper.eq(Chat::getReceiverId, userId);
+        queryWrapper.orderByDesc(Chat::getChatTime);
+        chatService.page(pageInfo, queryWrapper);
+        return R.success(pageInfo);
     }
 
 }
