@@ -7,7 +7,6 @@
 package com.neo.bookhouse.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.neo.bookhouse.common.BaseContext;
 import com.neo.bookhouse.common.R;
 import com.neo.bookhouse.entity.User;
 import com.neo.bookhouse.service.SendMailService;
@@ -99,6 +98,16 @@ public class UserController {
             return R.error("该邮箱未注册");
         }
         return R.success(one);
+    }
+
+    @PostMapping("/{id}")
+    public R<User> getUser(@PathVariable Long id) {
+        User user = userService.getById(id);
+        if (user == null) {
+            return R.error("用户不存在");
+        }
+        user.setUserPassword(null);
+        return R.success(user);
     }
 
     @PutMapping
