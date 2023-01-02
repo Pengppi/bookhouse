@@ -11,10 +11,11 @@ import lombok.Data;
 @Data
 public class Booktag {
 
-    private String bookKind;
+    private String bookIsbn;
 
-    private Integer bookSum;
+    private String bookTag;
     
+    private Integer bookSum;
 
 }
 

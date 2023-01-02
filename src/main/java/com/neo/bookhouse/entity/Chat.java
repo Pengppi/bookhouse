@@ -14,9 +14,9 @@ import java.util.Date;
 @Data
 public class Chat {
 
-    private Long useraId;
+    private Long senderId;
 
-    private Long userbId;
+    private Long receiverId;
 
     private LocalDateTime chatTime;
 

@@ -8,6 +8,7 @@ package com.neo.bookhouse.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.neo.bookhouse.common.BaseContext;
 import com.neo.bookhouse.common.R;
 import com.neo.bookhouse.entity.Book;
 import com.neo.bookhouse.service.BookService;
@@ -39,7 +40,8 @@ public class BookController {
         log.info("添加书籍：{}", book);
         //String userId = request.getAttribute("userId").toString();
         //book.setUserId(userId);
-        book.setUserId(1L);
+        //book.setUserId(1L);
+        book.setUserId(BaseContext.getCurrentId());
         boolean flg = bookService.save(book);
         if (flg) {
             return R.success("添加成功");
