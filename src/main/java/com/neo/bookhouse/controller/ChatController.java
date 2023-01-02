@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,8 +37,8 @@ public class ChatController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/list")
-    public R<List<ContactDto>> list(@RequestParam("userId") Long userId) {
+    @PostMapping("/list/{userId}")
+    public R<List<ContactDto>> list(@PathVariable Long userId) {
         LambdaQueryWrapper<Contact> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Contact::getReceiverId, userId);
         queryWrapper.orderByDesc(Contact::getUpdateTime);
@@ -57,24 +58,43 @@ public class ChatController {
 
     @PostMapping("/send")
     public R<String> send(@RequestBody Chat chat) {
+        chat.setChatTime(LocalDateTime.now());
         if (chatService.save(chat)) {
-
-
+            contactService.updateUnreadCount(chat.getSenderId(), chat.getReceiverId());
             return R.success("发送成功");
         }
         return R.error("发送失败");
     }
 
-    @PostMapping("/build")
-    public R<String> build(@RequestParam("userId") Long userId, @RequestParam("receiverId") Long receiverId) {
+    @PostMapping("/{userId}/{anotherId}")
+    public R<String> build(@PathVariable Long userId, @PathVariable Long anotherId) {
         Contact contact = new Contact();
-        contact.setSenderId(userId);
-        contact.setReceiverId(receiverId);
+        contact.setSenderId(anotherId);
+        contact.setReceiverId(userId);
         contact.setUnreadCount(0);
         if (contactService.save(contact)) {
-            return R.success("建立联系成功");
+            return R.success("添加成功");
         }
-        return R.error("建立联系失败");
+        return R.error("添加失败");
+    }
+
+    @GetMapping("/read/{userId}/{anotherId}")
+    public R<String> read(@PathVariable Long userId, @PathVariable Long anotherId) {
+        if (contactService.updateUnreadCountToZero(anotherId, userId)) {
+            return R.success("更新成功");
+        }
+        return R.error("更新失败");
+    }
+
+    @DeleteMapping("/{userId}/{anotherId}")
+    public R<String> delete(@PathVariable Long userId, @PathVariable Long anotherId) {
+        LambdaQueryWrapper<Contact> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Contact::getSenderId, anotherId);
+        queryWrapper.eq(Contact::getReceiverId, userId);
+        if (contactService.remove(queryWrapper)) {
+            return R.success("删除成功");
+        }
+        return R.error("删除失败");
     }
 
 }

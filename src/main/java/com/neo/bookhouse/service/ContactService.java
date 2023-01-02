@@ -11,5 +11,7 @@ import com.neo.bookhouse.entity.Contact;
 
 public interface ContactService extends IService<Contact> {
 
+    boolean updateUnreadCount(Long senderId, Long receiverId);
 
+    boolean updateUnreadCountToZero(Long senderId, Long receiverId);
 }

@@ -20,16 +20,12 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         log.info("公共字段自动填充[insert]...");
-        log.info(metaObject.toString());
         metaObject.setValue("updateTime", LocalDateTime.now());
-
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         log.info("公共字段自动填充[update]...");
-        log.info(metaObject.toString());
         metaObject.setValue("updateTime", LocalDateTime.now());
-
     }
 }
