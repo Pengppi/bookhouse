@@ -45,48 +45,48 @@ public class BookController {
     
     public static final int pageSize = 8; //按标签分页的大小为8
 
-    public void bookTagFunc(Booktag booktag, String isbn, String kind, int mode)//mode(0为增加，1为删除)
+    public void bookTagFunc(Booktag booktag, String isbn, Integer kind, int mode)//mode(0为增加，1为删除)
     {
-    	int sum;
-    	if(mode == 0)//增加
-    	{
-    		if(booktag == null)//记录为空
-	     	{
-	     	    //添加最新的标签
-	     	   booktag = Booktag.builder().bookIsbn(isbn).bookKind(kind).bookSum(1).build();
-	     	   bookTagService.save(booktag);
-	     	 }
-	    	else{//标签数量+1
-	    	 sum = booktag.getBookSum();
-	    	 System.out.println("sum: "+sum);
-	    	 LambdaQueryWrapper<Booktag>wrapper = new LambdaQueryWrapper<>();
-	    	 wrapper.eq(Booktag::getBookIsbn, isbn);
-	    	 wrapper.eq(Booktag::getBookKind, kind);
-	    	 booktag = Booktag.builder().bookIsbn(isbn).bookKind(kind).bookSum(sum+1).build();
-	    	 bookTagService.update(booktag,wrapper);
-	    	}
-    	}
-    	else{//删除
-    		if(booktag != null)//记录不为空才能删除
-    		{
-    		sum = booktag.getBookSum();
-    		LambdaQueryWrapper<Booktag>wrapper = new LambdaQueryWrapper<>();
-	    	wrapper.eq(Booktag::getBookIsbn, isbn);
-	    	wrapper.eq(Booktag::getBookKind, kind);
-	    	if(sum <= 1)	
-	    	bookTagService.remove(wrapper);//数量小于1，删除标签
-	    	else 
-	    	{
-	    	booktag = Booktag.builder().bookIsbn(isbn).bookKind(kind).bookSum(sum-1).build();
-			bookTagService.update(booktag,wrapper);//数量-1
-    		}
-    		}
-    	}
+//    	int sum;
+//    	if(mode == 0)//增加
+//    	{
+//    		if(booktag == null)//记录为空
+//	     	{
+//	     	    //添加最新的标签
+//	     	   booktag = Booktag.builder().bookIsbn(isbn).bookKind(kind).bookSum(1).build();
+//	     	   bookTagService.save(booktag);
+//	     	 }
+//	    	else{//标签数量+1
+//	    	 sum = booktag.getBookSum();
+//	    	 System.out.println("sum: "+sum);
+//	    	 LambdaQueryWrapper<Booktag>wrapper = new LambdaQueryWrapper<>();
+//	    	 wrapper.eq(Booktag::getBookIsbn, isbn);
+//	    	 wrapper.eq(Booktag::getBookKind, kind);
+//	    	 booktag = Booktag.builder().bookIsbn(isbn).bookKind(kind).bookSum(sum+1).build();
+//	    	 bookTagService.update(booktag,wrapper);
+//	    	}
+//    	}
+//    	else{//删除
+//    		if(booktag != null)//记录不为空才能删除
+//    		{
+//    		sum = booktag.getBookSum();
+//    		LambdaQueryWrapper<Booktag>wrapper = new LambdaQueryWrapper<>();
+//	    	wrapper.eq(Booktag::getBookIsbn, isbn);
+//	    	wrapper.eq(Booktag::getBookKind, kind);
+//	    	if(sum <= 1)	
+//	    	bookTagService.remove(wrapper);//数量小于1，删除标签
+//	    	else 
+//	    	{
+//	    	booktag = Booktag.builder().bookIsbn(isbn).bookKind(kind).bookSum(sum-1).build();
+//			bookTagService.update(booktag,wrapper);//数量-1
+//    		}
+//    		}
+//   	}
     	
     }
     
     //自动根据标签更新书籍种类的函数(kind1表示原来的KIND,kind2表示最新的KIND)
-    public void changeBookKindByTag(String isbn, String kind1, String kind2, int mode)//0表示增加，1表示修改，2表示删除
+    public void changeBookKindByTag(String isbn, Integer kind1, Integer kind2, int mode)//0表示增加，1表示修改，2表示删除
     {
     	if(isbn != null && kind1 != null)
     	{
@@ -135,7 +135,8 @@ public class BookController {
         book.setUserId(BaseContext.getCurrentId());
         
         //获取书籍的ISBN号和书的类型，用来动态修改标签
-        String isbn = null, kind = null;
+        String isbn = null;
+        Integer kind = null;
         if(book != null)
         {
         isbn = book.getBookIsbn();
@@ -158,7 +159,8 @@ public class BookController {
     	wrapper.eq(Book::getBookId, id);
     	Book book = bookService.getOne(wrapper);
     	log.info(book.toString());
-    	String kind = null,isbn = null;
+    	Integer kind = null;
+    	String isbn = null;
     	if(book != null)
     	{
         kind = book.getBookKind();//要删除书的种类
@@ -168,8 +170,9 @@ public class BookController {
         if(flg)
         {
         	changeBookKindByTag(isbn, kind, kind, 2);//删除标签
+        	return R.success("修改失败");
         }
-        return R.success("删除成功");
+        return R.error("删除成功");
     }
     
     @PutMapping("/update")//编辑书籍
@@ -178,8 +181,8 @@ public class BookController {
         //查询该书的ID
     	LambdaQueryWrapper<Book>wrapper = new LambdaQueryWrapper<>();
     	wrapper.eq(Book::getBookId, book.getBookId());
-        String kind = bookService.getOne(wrapper).getBookKind();//原来的种类
-        String kind2 = book.getBookKind();//要修改的种类
+        Integer kind = bookService.getOne(wrapper).getBookKind();//原来的种类
+        Integer kind2 = book.getBookKind();//要修改的种类
     	String isbn = book.getBookIsbn();
     	boolean flg = bookService.updateById(book);
     	//可能修改对应的标签
@@ -187,8 +190,9 @@ public class BookController {
     	{
     		if(!kind.equals(kind2))//表明要修改种类
     		changeBookKindByTag(isbn, kind, kind2, 1);//修改
+    		return R.success("修改成功");
     	}
-    	return R.success("修改成功");
+    	return R.error("修改失败");
      }
     
     @PostMapping("/cover/{id}")//上传书籍封面("bookId")
@@ -216,7 +220,7 @@ public class BookController {
     }
     
     @GetMapping("/findByTag/{bookTag}/{page}")//通过书籍标签查找书名,参数为标签和页号
-    public R<Page<Book>> getBookByTag(@PathVariable String bookTag, @PathVariable int page)
+    public R<Page<Book>> getBookByTag(@PathVariable Integer bookTag, @PathVariable int page)
     {
     	//分页构造器
     	Page<Book>pageBuilder = new Page<>(page, pageSize);
@@ -225,7 +229,7 @@ public class BookController {
     	
     	//多层查询语句
 
-        String sql = "select book_isbn from (select book_isbn, Max(book_sum), book_kind from booktag group by book_isbn having book_kind = '"+bookTag+"')as A";
+        String sql = "select book_isbn from (select book_isbn, Max(book_sum), book_kind from booktag group by book_isbn having book_kind = "+bookTag+")as A";
     	
     	queryWrapper.inSql(Book::getBookIsbn, sql);
     

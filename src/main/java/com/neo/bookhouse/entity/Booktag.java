@@ -3,22 +3,30 @@ package com.neo.bookhouse.entity;
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * (Booktag)实体类
- *
- * @author makejava
- * @since 2023-01-01 18:45:57
- */
 @Data
 @Builder
 public class Booktag {
 
     private String bookIsbn;
 
-    private String bookKind;
+    private Integer bookKind;
 
-    private Integer bookSum;
-
-
+    private Integer educationSum;//教育类数量
+    
+    private Integer literatureArtSum;//文学类数量
+    
+    private Integer comicHumorSum; //漫画幽默类数量
+    
+    private Integer youthSum; //青春类
+    
+    private Integer childrenSum; //童书类
+    
+    private Integer socialScienceSum; //社会科学类
+    
+    private Integer lifeSum; //生活类
+    
+    private Integer technologySum; //科技类
+    
+    private Integer fictionSum; //科幻小说类
 }
 

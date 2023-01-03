@@ -26,7 +26,7 @@ public class Book {
 
     private String bookAuthor;
 
-    private String bookKind;
+    private Integer bookKind;
 
     private String bookPhoto;
 

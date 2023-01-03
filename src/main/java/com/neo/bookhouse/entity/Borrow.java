@@ -1,5 +1,6 @@
 package com.neo.bookhouse.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
  * @since 2023-01-01 18:44:21
  */
 @Data
+@Builder
 public class Borrow {
 
     private Long userId;
@@ -18,8 +20,6 @@ public class Borrow {
     private LocalDateTime borrowDate;
     
     private Long bookId;
-    
-    private String failMsg;
     
     private LocalDateTime shouldDate;
     

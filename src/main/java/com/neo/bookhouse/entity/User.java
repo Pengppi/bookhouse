@@ -31,5 +31,9 @@ public class User {
     private String userAddress;
 
     private Integer userKind;
+    
+    private Integer userLongitude;   //经度
+    
+    private Integer userLatitude;   //纬度
 }
 
