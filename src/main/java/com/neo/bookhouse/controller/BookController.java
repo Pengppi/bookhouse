@@ -29,8 +29,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -191,28 +193,34 @@ public class BookController {
         return R.error("添加失败");
     }
 
-    @DeleteMapping("/delete/{id}")//删除书籍
-    public R<String> delete(@PathVariable Long id)//路径变量
+    @DeleteMapping("/delete")//批量删除书籍
+    public R<String> delete(@RequestParam List<Long> ids)//路径变量
     {
-    	log.info("删除{}",id);
+    	log.info("删除{}",ids);
+    	
+    	Integer kind = null;
+    	String isbn = null;
+    	boolean flg = true, cur = true;//删除状态
+    	
+    	for(Long id : ids)
+    	{
     	LambdaQueryWrapper<Book>wrapper = new LambdaQueryWrapper<>();
     	wrapper.eq(Book::getBookId, id);
     	Book book = bookService.getOne(wrapper);
-    	log.info(book.toString());
-    	Integer kind = null;
-    	String isbn = null;
+    	
     	if(book != null)
     	{
+    	log.info(book.toString());
         kind = book.getBookKind();//要删除书的种类
     	isbn = book.getBookIsbn(); 
-    	}
-        boolean flg = bookService.removeById(id);
-        if(flg)
-        {
+        cur = bookService.removeById(id);
+        if(cur)
         	changeBookKindByTag(isbn, kind, kind, 2);//删除标签
-        	return R.success("删除成功");
-        }
-        return R.error("删除成功");
+
+        flg &= cur;
+    	}
+    	}
+    	return flg ? R.success("删除成功") :  R.error("删除失败");
     }
     
     @PutMapping("/update")//编辑书籍
@@ -251,12 +259,15 @@ public class BookController {
     	return R.success(bookService.list(queryWrapper));
     }
     
-    @GetMapping("/findByName/{bookName}")//通过字符串查找书名
-    public R<List<Book>> getBookByName(@PathVariable String bookName)
+    @GetMapping("/findByName/{bookName}/{page}")//通过字符串查找书名，参数为查找的书名和页号
+    public R<Page<Book>> getBookByName(@PathVariable String bookName, @PathVariable int page)
     {
+    	//分页构造器
+    	Page<Book>pageBuilder = new Page<>(page, pageSize);
+    	//查询条件
     	LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
     	queryWrapper.like(Book::getBookName, bookName);
-    	return R.success(bookService.list(queryWrapper));
+    	return R.success(bookService.page(pageBuilder, queryWrapper));
     }
     
     @GetMapping("/findByTag/{userId}/{bookTag}/{page}")//通过书籍标签查找书名,参数为借书者的ID,标签和页号
@@ -285,8 +296,8 @@ public class BookController {
     	  {
     		//多层查询语句,按照距离远近来排序
     	    //String sql2 = "select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2)) from user";
-    		  String sql2 = "(select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2)) from user)as dist";
-    	    queryWrapper.orderBy(true, false, sql2);
+    		 // String sql2 = "(select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2)) from user)as dist";
+    	   // queryWrapper.orderBy(true, false, sql2);
     	  }
     	}
     	

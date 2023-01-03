@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
  * @since 2023-01-01 18:44:21
  */
 @Data
-@Builder
 public class Borrow {
 
     private Long userId;

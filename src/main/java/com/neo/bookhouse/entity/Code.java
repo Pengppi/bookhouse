@@ -10,7 +10,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 public class Code {
 
     //BigDecimal

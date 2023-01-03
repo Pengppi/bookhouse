@@ -36,11 +36,16 @@ public class CodeController {
 	 @PostMapping("/add")//新增借书还书码
 	    public R<String> add(@RequestBody Code code) {
 	        log.info("生成码：{}", code);
-	        
+	        //判断书是否存在
+	        Book book = bookService.getOne(new LambdaQueryWrapper<Book>().eq(Book::getBookId, code.getBookId()));
+	        if(book == null)//书不存在
+	        	return R.error("书不存在，不能生成借书码");
 	        //判断书的状态，若被借走则不能生成借书码
-	        Integer state = bookService.getOne(new LambdaQueryWrapper<Book>().eq(Book::getBookId, code.getBookId())).getBookBorrow();
+	        Integer state = book.getBookBorrow();
 	        if(state.equals(1) && code.getCodeType().equals(0))//表示书已经被借走了。
 	        	return R.error("书已经被借走");
+	        if(state.equals(0) && code.getCodeType().equals(1))//表示书还没有借出去，不能还书
+	        	return R.error("书没有被借走");
 	        
 	        //借书码已经存在也不能生成借书码
 	        Code code2 = codeService.getOne(new LambdaQueryWrapper<Code>().eq(Code::getBookId, code.getBookId()));
@@ -76,16 +81,17 @@ public class CodeController {
 		   if(flg == true)//检验成功
 		   {
 			   codeService.removeById(code);//删除借书码
-			   return R.success("检验成功");
+			   return R.success("匹配成功");
 		   }
 		   else //检验失败
-		   return R.error("检验失败");
+		   return R.error("匹配失败");
 	    }
 	 
 	   @DeleteMapping("/delete/{bookId}")//删除对应bookId的借书码（借书码失效等）
 	      public R<String> delete(@PathVariable Long bookId)
 	      {
-		    Code code = Code.builder().bookId(bookId).build();
+		    Code code = new Code();
+		    code.setBookId(bookId);
 		    boolean flg = codeService.removeById(code);
 		    return flg ? R.success("删除成功") : R.error("删除失败");
 	      }
