@@ -32,8 +32,8 @@ public class User {
 
     private Integer userKind;
     
-    private Integer userLongitude;   //经度
+    private Double userLongitude;   //经度
     
-    private Integer userLatitude;   //纬度
+    private Double userLatitude;   //纬度
 }
 
