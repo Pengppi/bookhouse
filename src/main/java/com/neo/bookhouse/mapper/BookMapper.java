@@ -7,10 +7,15 @@
 package com.neo.bookhouse.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.neo.bookhouse.dto.BookDto;
 import com.neo.bookhouse.entity.Book;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface BookMapper extends BaseMapper<Book> {
+
+    List<BookDto> getDtoList(Integer bookKind);
 
 }
