@@ -265,8 +265,14 @@ public class BookController {
     	//分页构造器
     	Page<Book>pageBuilder = new Page<>(page, pageSize);
     	//查询条件
-    	LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
-    	queryWrapper.like(Book::getBookName, bookName);
+    	//LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
+    	//queryWrapper.like(Book::getBookName, bookName);
+    	
+    	QueryWrapper<Book>queryWrapper = new QueryWrapper<>();
+    	queryWrapper.like("book_name", bookName);
+    	Double longtitude = 10.0, latitude = 10.0;
+    	String sql = "select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2) as dist from user";
+	     queryWrapper.orderByAsc(sql);
     	return R.success(bookService.page(pageBuilder, queryWrapper));
     }
     
@@ -295,9 +301,9 @@ public class BookController {
     	  if(longtitude != null && latitude != null)//经度和纬度都存在时候才能排序。
     	  {
     		//多层查询语句,按照距离远近来排序
-    	    //String sql2 = "select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2)) from user";
-    		 // String sql2 = "(select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2)) from user)as dist";
-    	   // queryWrapper.orderBy(true, false, sql2);
+    	    //String sql = "select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2)) as dist from user";
+    		 String sql2 = "select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2) as dist from user";
+             queryWrapper.orderByAsc(sql2);
     	  }
     	}
     	
