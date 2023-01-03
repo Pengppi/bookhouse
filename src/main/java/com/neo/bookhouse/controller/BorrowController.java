@@ -61,18 +61,33 @@ public class BorrowController {
 	        return R.error("借书失败");
 	    }
 	 
-	 @PutMapping("/update/{state}")//编辑借书记录（在还书时改变）,state表示要更改的借书记录原本的状态，只能是0在借中,2未归还
-     public R<String>update(@RequestBody Borrow borrow, @PathVariable Integer state)
+	 @PutMapping("/update")//编辑借书记录（在还书时改变）
+     public R<String>update(@RequestBody Borrow borrow)
      {
-		 if(state == 1)//不能更改已经归还的借书记录
-		  return R.success("不能更改借书记录状态已经归还的记录");
     	LambdaQueryWrapper<Borrow>wrapper = new LambdaQueryWrapper<>();
     	wrapper.eq(Borrow::getBookId, borrow.getBookId());
-        wrapper.eq(Borrow::getBorrowState, state);
+        wrapper.eq(Borrow::getBorrowState, 0);
         wrapper.eq(Borrow::getUserId, borrow.getUserId());
+        Borrow borrow_zero = borrowService.getOne(wrapper);//借书中的借书记录
         
-    	boolean flg = borrowService.update(borrow, wrapper);
-    	if(flg)
+        LambdaQueryWrapper<Borrow>wrapper2 = new LambdaQueryWrapper<>();
+        wrapper2.eq(Borrow::getBookId, borrow.getBookId());
+        wrapper2.eq(Borrow::getBorrowState, 2);
+        wrapper2.eq(Borrow::getUserId, borrow.getUserId());
+        Borrow borrow_two = borrowService.getOne(wrapper2);//未归还的借书记录
+        
+        if(borrow_zero == null && borrow_two == null)//没有可以修改的借书记录
+        	return R.error("没有可以修改的借书记录");
+        
+        LambdaQueryWrapper<Borrow>wrapper3 = new LambdaQueryWrapper<>();
+        wrapper3.eq(Borrow::getBookId, borrow.getBookId());
+        wrapper3.eq(Borrow::getUserId, borrow.getUserId());
+        wrapper3.eq(Borrow::getBorrowState, borrow_zero == null ? 2:0);//保证选中借书记录为在借中0或者未归还2
+        if(borrow.getBorrowState() == 1)//表示要归还
+        borrow.setReturnDate(LocalDateTime.now());//自动生成归还日期。
+        
+    	boolean flg = borrowService.update(borrow, wrapper3);
+    	if(flg == true)
     	{
     		if(borrow.getBorrowState() == 1)//表示已经归还
     		{
@@ -81,7 +96,7 @@ public class BorrowController {
     			book.setBookBorrow(0);//将书的状态设为0表示书已经归还。
 	        	bookService.updateById(book);
     		}
-    		R.success("修改借书记录成功");
+    		return R.success("修改借书记录成功");
     	}
     	return R.success("修改借书记录失败");
      }

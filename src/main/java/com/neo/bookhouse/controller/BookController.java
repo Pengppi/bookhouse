@@ -259,8 +259,8 @@ public class BookController {
     	return R.success(bookService.list(queryWrapper));
     }
     
-    @GetMapping("/findByName/{bookName}/{page}")//通过字符串查找书名，参数为查找的书名和页号
-    public R<Page<Book>> getBookByName(@PathVariable String bookName, @PathVariable int page)
+    @GetMapping("/findByName/{userId}/{bookName}/{page}")//通过字符串查找书名，参数为借书者的id,查找的书名和页号
+    public R<Page<Book>> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page)
     {
     	//分页构造器
     	Page<Book>pageBuilder = new Page<>(page, pageSize);

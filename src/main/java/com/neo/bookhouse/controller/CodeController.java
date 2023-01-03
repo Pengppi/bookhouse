@@ -70,11 +70,19 @@ public class CodeController {
 	 @PostMapping("/check/{bookId}/{codeStr}")//检验借书还书码
 	    public R<String> check(@PathVariable Long bookId,@PathVariable String codeStr)//书的ID, 要检验的字符串
 	    {
+		   LocalDateTime dateTime = LocalDateTime.now();
 		   LambdaQueryWrapper<Code>wrapper = new LambdaQueryWrapper<>();
 		   wrapper.eq(Code::getBookId, bookId);
 		   Code code = codeService.getOne(wrapper);
 		   
 		   if(code == null)return R.error("借书码不存在");
+		   
+		   //检验是否超时
+		   if(dateTime.isAfter(code.getCodeEnd()))//已经超时
+		   {
+			   codeService.removeById(code);//删除借书码,借书码无效
+			   return R.success("匹配超时，借书码已经失效");
+		   }
 		   //检验是否一致
 		   boolean flg = code.getCodeContent().equals(codeStr);
 		   
@@ -90,9 +98,9 @@ public class CodeController {
 	   @DeleteMapping("/delete/{bookId}")//删除对应bookId的借书码（借书码失效等）
 	      public R<String> delete(@PathVariable Long bookId)
 	      {
-		    Code code = new Code();
-		    code.setBookId(bookId);
-		    boolean flg = codeService.removeById(code);
+		    LambdaQueryWrapper<Code>wrapper = new LambdaQueryWrapper<>();
+		    wrapper.eq(Code::getBookId,bookId);
+		    boolean flg = codeService.remove(wrapper);
 		    return flg ? R.success("删除成功") : R.error("删除失败");
 	      }
 }
