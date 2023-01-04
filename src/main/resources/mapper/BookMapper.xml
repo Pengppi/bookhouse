@@ -17,7 +17,7 @@
         limit #{offset},#{pageSize}
     </select>
 
-    <select id="countDtoList" resultType="int" >
+    <select id="countDtoList" resultType="java.lang.Integer" >
         select count(*)
         from book
         where book.book_isbn IN (select book_isbn from booktag WHERE book_kind = #{bookKind})

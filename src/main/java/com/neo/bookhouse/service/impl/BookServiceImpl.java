@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements BookService {
@@ -40,11 +39,6 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
         return bookMapper.getDtoList2(bookName);
     }
 
-    @Override
-    public Map<String, Object> getLocation(Long bookId) {
-
-        return null;
-    }
 
     @Override
     public List<Long> getIdLikeName(String name)//根据字符串查找书籍的ID

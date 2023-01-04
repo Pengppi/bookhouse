@@ -10,15 +10,14 @@ package com.neo.bookhouse.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.neo.bookhouse.dto.BookDto;
 import com.neo.bookhouse.entity.Book;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
 
 public interface BookService extends IService<Book> {
 
-    List<BookDto> getDtoListByPage(Integer bookKind, int page, int pageSize);//用于标签查找
-
-    Map<String, Object> getLocation(Long bookId);
+    List<BookDto> getDtoListByPage( Integer bookKind, int page, int pageSize);//用于标签查找
 
     public List<BookDto> getDtoList2(String bookName);
 
