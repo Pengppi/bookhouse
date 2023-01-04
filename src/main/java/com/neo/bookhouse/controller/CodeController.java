@@ -60,7 +60,10 @@ public class CodeController {
 	        //借书码已经存在也不能生成借书码
 	        Code code = codeService.getOne(new LambdaQueryWrapper<Code>().eq(Code::getBookId, bookId));
 	        if(code != null)//已经存在借书码,要保证借书码的唯一性
-	        	return R.error("借书码已经存在");
+	        {
+	        	codeService.remove(new LambdaQueryWrapper<Code>().eq(Code::getCodeId,code.getCodeId()));//删除之前借书码
+				code_set.remove(code.getCodeId());
+	        }
 	        
 	        Code code2 = new Code();
 	        String codeStr = null;
@@ -86,31 +89,28 @@ public class CodeController {
 	    }
 	 
 	 
-	 @PostMapping("/check/{userId}/{codeStr}/{checkStr}")//检验借书还书码
-	    public R<String> check(@PathVariable Long userId, @PathVariable String codeStr, @PathVariable String checkStr)//用户ID, 借书码内容, 要检验的字符串
+	 @PostMapping("/check/{userId}/{codeId}")//检验借书还书码
+	    public R<String> check(@PathVariable Long userId, @PathVariable String codeId)//用户ID, 要检验的借书码内容
 	    {
 		   LocalDateTime dateTime = LocalDateTime.now();
 		   LambdaQueryWrapper<Code>wrapper = new LambdaQueryWrapper<>();
-		   wrapper.eq(Code::getCodeId, codeStr);
+		   wrapper.eq(Code::getCodeId, codeId);
 		   Code code = codeService.getOne(wrapper);
 		   
-		   if(code == null)return R.error("借书码不存在");
+		   if(code == null)return R.error("匹配失败");
 		   
 		   //检验是否超时
 		   if(dateTime.isAfter(code.getCodeEnd()))//已经超时
 		   {
 			   codeService.remove(wrapper);
-			   code_set.remove(codeStr);
-			   return R.error("匹配超时，借书码已经失效");
+			   code_set.remove(codeId);
+			   return R.error("匹配超时");
 		   }
-		   //检验是否一致
-		   boolean flg = codeStr.equals(checkStr);
 		   
 		   String borrow_state_str = "";//借书情况信息
-		   if(flg == true)//检验成功
-		   {
+		   //检验成功
 			   codeService.remove(wrapper);//删除借书码
-			   code_set.remove(codeStr);
+			   code_set.remove(codeId);
 			   if(code.getCodeType().equals(0))//表示借书成功，生成借书记录
 			   {
 				   borrow_state_str = addBorrow(userId, code.getBookId());//借书是否成功返回信息
@@ -120,9 +120,6 @@ public class CodeController {
 				   borrow_state_str = returnBorrow(userId, code.getBookId());//还书是否成功返回信息
 			   }
 			   return R.success("匹配成功,"+borrow_state_str);
-		   }
-		   else //检验失败
-		   return R.error("匹配失败");
 	    }
 	 
 	 public static final long ONE_MONTH = 1L;//一个月的时间
