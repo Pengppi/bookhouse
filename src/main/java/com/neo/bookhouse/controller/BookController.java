@@ -31,9 +31,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/book")
 @Slf4j
 public class BookController {
-
-    public static final int pageSize = 8; //按标签分页的大小为8
-    
+ 
     @Autowired
     BookService bookService;
     @Autowired
@@ -277,8 +275,8 @@ public class BookController {
          return dtoPage;
     }
 
-    @GetMapping("/findByName/{userId}/{bookName}/{page}")//通过字符串查找书名，参数为借书者的id,查找的书名和页号
-    public R<Page> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page) {
+    @GetMapping("/listByName/{userId}/{bookName}/{page}/{pageSize}")//通过字符串查找书名，参数为借书者的ID,标签,页号和页面大小
+    public R<Page> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page, @PathVariable int pageSize) {
         //分页构造器
         Page<Book> pageBuilder = new Page<>(page, pageSize);
         List<Long> ids = bookService.getIdLikeName(bookName);
@@ -289,8 +287,8 @@ public class BookController {
         return R.success(getBookDtoByPage(userId, page, pageBuilder));
     }
 
-    @GetMapping("/findByTag/{userId}/{bookTag}/{page}")//通过书籍标签查找书名,参数为借书者的ID,标签和页号
-    public R<Page> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page) {
+    @GetMapping("/findByTag/{userId}/{bookTag}/{page}/{pageSize}")//通过书籍标签查找书名,参数为借书者的ID,标签,页号和页面大小
+    public R<Page> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page, @PathVariable int pageSize) {
     	
     	List<String> isbnList = bookTagService.getIsbnByTag(bookTag);
         Page<Book> pageBuilder = new Page<>(page, pageSize);
@@ -299,44 +297,6 @@ public class BookController {
         bookService.page(pageBuilder, queryWrapper);
 
         return R.success(getBookDtoByPage(userId, page, pageBuilder));
-    }
-
-    @GetMapping("/listByTag/{userId}/{bookTag}/{page}/{pageSize}")//通过书籍标签查找书名,参数为借书者的ID,标签和页号
-    public R<Page> getListByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page, @PathVariable int pageSize) {
-        List<String> isbnList = bookTagService.getIsbnByTag(bookTag);
-        Page<Book> bookPage = new Page<>(page, pageSize);
-        LambdaQueryWrapper<Book> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.in(Book::getBookIsbn, isbnList);
-        bookService.page(bookPage, queryWrapper);
-        Page<BookDto> dtoPage = new Page<>();
-        BeanUtils.copyProperties(bookPage, dtoPage, "records");
-
-        List<BookDto> bookDtos = bookPage.getRecords().stream().map(book -> {
-            BookDto bookDto = new BookDto();
-            BeanUtils.copyProperties(book, bookDto);
-            Long bookKeeperId = book.getUserId();
-            User bookKeeper = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserId, bookKeeperId));
-            bookDto.setUserLatitude(bookKeeper.getUserLatitude());
-            bookDto.setUserLongitude(bookKeeper.getUserLongitude());
-            return bookDto;
-        }).collect(Collectors.toList());
-
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserId, userId));
-
-        if (user != null) {
-            Double longtitude = user.getUserLongitude(); //获取用户经度
-            Double latitude = user.getUserLatitude(); //获取用户纬度
-            if (longtitude != null && latitude != null)//经度和纬度都存在时候才能排序。
-            {
-                bookDtos.sort((o1, o2) -> {
-                    Double dist1 = Math.sqrt(Math.pow(o1.getUserLongitude() - longtitude, 2) + Math.pow(o1.getUserLatitude() - latitude, 2));
-                    Double dist2 = Math.sqrt(Math.pow(o2.getUserLongitude() - longtitude, 2) + Math.pow(o2.getUserLatitude() - latitude, 2));
-                    return dist1.compareTo(dist2);
-                });
-            }
-        }
-        dtoPage.setRecords(bookDtos);
-        return R.success(dtoPage);
     }
 
 }
