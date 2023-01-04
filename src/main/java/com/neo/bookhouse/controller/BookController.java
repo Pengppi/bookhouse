@@ -31,8 +31,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BookController {
 
-    public static final int pageSize = 8; //按标签分页的大小为8
-
     @Autowired
     BookService bookService;
     @Autowired
@@ -274,8 +272,8 @@ public class BookController {
         return dtoPage;
     }
 
-    @GetMapping("/findByName/{userId}/{bookName}/{page}")//通过字符串查找书名，参数为借书者的id,查找的书名和页号
-    public R<Page> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page) {
+    @GetMapping("/listByName/{userId}/{bookName}/{page}/{pageSize}")//通过字符串查找书名，参数为借书者的id,查找的书名,页号和页面大小
+    public R<Page> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page, @PathVariable int pageSize) {
         //分页构造器
         Page<Book> pageBuilder = new Page<>(page, pageSize);
         List<Long> ids = bookService.getIdLikeName(bookName);
@@ -286,8 +284,8 @@ public class BookController {
         return R.success(getBookDtoByPage(userId, page, pageBuilder));
     }
 
-    @GetMapping("/findByTag/{userId}/{bookTag}/{page}")//通过书籍标签查找书名,参数为借书者的ID,标签和页号
-    public R<Page> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page) {
+    @GetMapping("/findByTag/{userId}/{bookTag}/{page}/{pageSize}")//通过书籍标签查找书名,参数为借书者的ID,标签,页号和页面大小
+    public R<Page> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page,@PathVariable int pageSize) {
 
         List<String> isbnList = bookTagService.getIsbnByTag(bookTag);
         Page<Book> pageBuilder = new Page<>(page, pageSize);
