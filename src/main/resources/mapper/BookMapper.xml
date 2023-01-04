@@ -9,18 +9,24 @@
 
 <mapper namespace="com.neo.bookhouse.mapper.BookMapper">
 
-    <select id="getDtoList" resultType="com.neo.bookhouse.dto.BookDto" >
+    <select id="getDtoListByPage" resultType="com.neo.bookhouse.dto.BookDto" >
         select book.*, user_longitude, user_latitude
         from book
         LEFT JOIN user on book.user_id = user.user_id
         where book.book_isbn IN (select book_isbn from booktag WHERE book_kind = #{bookKind})
+        limit #{offset},#{pageSize}
     </select>
-    
+
+    <select id="countDtoList" resultType="int" >
+        select count(*)
+        from book
+        where book.book_isbn IN (select book_isbn from booktag WHERE book_kind = #{bookKind})
+    </select>
+
     <select id="getDtoList2" resultType = "com.neo.bookhouse.dto.BookDto" >
          select * from book where book_name like '%#{bookName}%';
      </select>
-     
+
 </mapper>
 
-     
-     
+

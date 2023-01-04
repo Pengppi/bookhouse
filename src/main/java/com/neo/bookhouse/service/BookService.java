@@ -16,11 +16,13 @@ import java.util.Map;
 
 public interface BookService extends IService<Book> {
 
-    List<BookDto> getDtoList(Integer bookKind);
+    List<BookDto> getDtoListByPage(Integer bookKind, int page, int pageSize);//用于标签查找
 
     Map<String, Object> getLocation(Long bookId);
-    
+
     public List<BookDto> getDtoList2(String bookName);
-    
+
     public List<Long> getIdLikeName(String name); //根据字符串查找书籍
+
+    int countDtoList(Integer bookKind);
 }

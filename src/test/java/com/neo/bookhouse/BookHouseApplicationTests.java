@@ -1,7 +1,6 @@
 package com.neo.bookhouse;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.neo.bookhouse.entity.User;
+import com.neo.bookhouse.dto.BookDto;
 import com.neo.bookhouse.mapper.BookMapper;
 import com.neo.bookhouse.service.BookService;
 import com.neo.bookhouse.service.BookTagService;
@@ -12,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Map;
+import java.util.List;
 
 @SpringBootTest
 @Slf4j
@@ -34,11 +33,13 @@ class BookHouseApplicationTests {
     BookMapper bookMapper;
 
     @Test
-    void contextLoads() {
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getUserId, 48);
-        queryWrapper.select(User::getUserLongitude, User::getUserLatitude);
-        Map<String, Object> map = userService.getMap(queryWrapper);
-        log.info("map: {}", map);
+    void testPage() {
+        List<BookDto> list = bookService.getDtoListByPage(1, 3, 5);
+        log.info(list.size() + "");
+    }
+
+    @Test
+    void count() {
+        log.info("count: {}", bookMapper.countDtoList(1));
     }
 }

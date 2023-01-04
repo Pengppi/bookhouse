@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.neo.bookhouse.dto.BookDto;
 import com.neo.bookhouse.entity.Book;
-import com.neo.bookhouse.entity.User;
 import com.neo.bookhouse.mapper.BookMapper;
 import com.neo.bookhouse.service.BookService;
 import com.neo.bookhouse.service.UserService;
@@ -30,30 +29,36 @@ public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements Bo
     private UserService userService;
 
     @Override
-    public List<BookDto> getDtoList(Integer bookKind) //用于标签查找
+    public List<BookDto> getDtoListByPage(Integer bookKind, int page, int pageSize) //用于标签查找
     {
-        return bookMapper.getDtoList(bookKind);
+        int offset = (page - 1) * pageSize;
+        return bookMapper.getDtoListByPage(bookKind, offset, pageSize);
     }
-   
+
     @Override
-	public List<BookDto> getDtoList2(String bookName) {//用于书名查找
-		return bookMapper.getDtoList2(bookName);
-	}
+    public List<BookDto> getDtoList2(String bookName) {//用于书名查找
+        return bookMapper.getDtoList2(bookName);
+    }
 
     @Override
     public Map<String, Object> getLocation(Long bookId) {
 
         return null;
     }
-    
-    @Override
-	public List<Long> getIdLikeName(String name)//根据字符串查找书籍的ID 
-    {
-		LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.like(Book::getBookName, name);
-		queryWrapper.select(Book::getBookId);
-		return this.listObjs(queryWrapper, o -> Long.valueOf(o.toString()));
-	}
 
-	
+    @Override
+    public List<Long> getIdLikeName(String name)//根据字符串查找书籍的ID
+    {
+        LambdaQueryWrapper<Book> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(Book::getBookName, name);
+        queryWrapper.select(Book::getBookId);
+        return this.listObjs(queryWrapper, o -> Long.valueOf(o.toString()));
+    }
+
+    @Override
+    public int countDtoList(Integer bookKind) {
+        return bookMapper.countDtoList(bookKind);
+    }
+
+
 }
