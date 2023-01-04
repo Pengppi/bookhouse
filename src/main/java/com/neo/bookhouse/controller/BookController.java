@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 public class BookController {
 
     public static final int pageSize = 8; //按标签分页的大小为8
+    
     @Autowired
     BookService bookService;
     @Autowired
@@ -156,6 +157,7 @@ public class BookController {
         Long userId = Long.valueOf(request.getParameter("id"));
         System.out.println("id: " + userId);
         book.setUserId(userId);
+        book.setBookBorrow(0);//刚添加的书籍没有被借走
         //book.setUserId(1L);
         //book.setUserId(BaseContext.getCurrentId());
 
@@ -235,55 +237,68 @@ public class BookController {
         queryWrapper.eq(Book::getUserId, id);
         return R.success(bookService.list(queryWrapper));
     }
+    
+    //地理位置排序函数
+    public Page<BookDto> getBookDtoByPage(Long userId, int page, Page<Book> pageBuilder)
+    {
+    	 Page<BookDto> dtoPage = new Page<>();
+         BeanUtils.copyProperties(pageBuilder, dtoPage, "records");
+
+         List<BookDto> bookDtos = pageBuilder.getRecords().stream().map(book -> {
+             BookDto bookDto = new BookDto();
+             BeanUtils.copyProperties(book, bookDto);
+             Long bookKeeperId = book.getUserId();
+             User bookKeeper = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserId, bookKeeperId));
+             if(bookKeeper == null)//用户不存在
+            	 return null;
+             bookDto.setUserLatitude(bookKeeper.getUserLatitude());
+             bookDto.setUserLongitude(bookKeeper.getUserLongitude());
+             return bookDto;
+         }).collect(Collectors.toList());
+
+         User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserId, userId));
+         
+         
+         
+         if (user != null) {
+             Double longtitude = user.getUserLongitude(); //获取用户经度
+             Double latitude = user.getUserLatitude(); //获取用户纬度
+             if (longtitude != null && latitude != null)//经度和纬度都存在时候才能排序。
+             {
+                 bookDtos.sort((o1, o2) -> {
+                     Double dist1 = Math.sqrt(Math.pow(o1.getUserLongitude() - longtitude, 2) + Math.pow(o1.getUserLatitude() - latitude, 2));
+                     Double dist2 = Math.sqrt(Math.pow(o2.getUserLongitude() - longtitude, 2) + Math.pow(o2.getUserLatitude() - latitude, 2));
+                     return dist1.compareTo(dist2);
+                 });
+             }
+         }
+         
+         dtoPage.setRecords(bookDtos);
+         return dtoPage;
+    }
 
     @GetMapping("/findByName/{userId}/{bookName}/{page}")//通过字符串查找书名，参数为借书者的id,查找的书名和页号
-    public R<Page<Book>> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page) {
+    public R<Page> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page) {
         //分页构造器
         Page<Book> pageBuilder = new Page<>(page, pageSize);
-        //查询条件
-        //LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
-        //queryWrapper.like(Book::getBookName, bookName);
-
-        QueryWrapper<Book> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("book_name", bookName);
-        Double longtitude = 10.0, latitude = 10.0;
-        String sql = "select sqrt(pow(user_longtitude-" + longtitude + ",2)+pow(user_latitude-" + latitude + ",2) as dist from user";
-        queryWrapper.orderByAsc(sql);
-        return R.success(bookService.page(pageBuilder, queryWrapper));
+        List<Long> ids = bookService.getIdLikeName(bookName);
+        LambdaQueryWrapper<Book> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Book::getBookId, ids);
+        bookService.page(pageBuilder, queryWrapper);
+        
+        return R.success(getBookDtoByPage(userId, page, pageBuilder));
     }
 
     @GetMapping("/findByTag/{userId}/{bookTag}/{page}")//通过书籍标签查找书名,参数为借书者的ID,标签和页号
-    public R<Page<Book>> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page) {
-        //分页构造器
+    public R<Page> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page) {
+    	
+    	List<String> isbnList = bookTagService.getIsbnByTag(bookTag);
         Page<Book> pageBuilder = new Page<>(page, pageSize);
-        //查询条件
-        //LambdaQueryWrapper<Book>queryWrapper = new LambdaQueryWrapper<>();
-        QueryWrapper<Book> queryWrapper = new QueryWrapper<>();
+        LambdaQueryWrapper<Book> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Book::getBookIsbn, isbnList);
+        bookService.page(pageBuilder, queryWrapper);
 
-        //多层查询语句
-        String sql = "select book_isbn from booktag where book_kind = " + bookTag;
-
-        queryWrapper.inSql("book_isbn", sql);
-        //queryWrapper.inSql(Book::getBookIsbn, sql);
-
-        //根据userId来查找借书者
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserId, userId));
-        if (user != null) {
-//    	Integer longtitude = user.getUserLongitude(); //获取用户经度
-//    	Integer latitude = user.getUserLatitude(); //获取用户纬度
-            Double longtitude = 10.0, latitude = 10.0;
-            if (longtitude != null && latitude != null)//经度和纬度都存在时候才能排序。
-            {
-                //多层查询语句,按照距离远近来排序
-                //String sql = "select sqrt(pow(user_longtitude-"+longtitude+",2)+pow(user_latitude-"+latitude+",2)) as dist from user";
-                String sql2 = "select sqrt(pow(user_longtitude-" + longtitude + ",2)+pow(user_latitude-" + latitude + ",2) as dist from user";
-                queryWrapper.orderByAsc(sql2);
-            }
-        }
-
-        Page<Book> result = bookService.page(pageBuilder, queryWrapper);
-
-        return R.success(result);
+        return R.success(getBookDtoByPage(userId, page, pageBuilder));
     }
 
     @GetMapping("/listByTag/{userId}/{bookTag}/{page}/{pageSize}")//通过书籍标签查找书名,参数为借书者的ID,标签和页号

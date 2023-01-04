@@ -19,4 +19,8 @@ public interface BookService extends IService<Book> {
     List<BookDto> getDtoList(Integer bookKind);
 
     Map<String, Object> getLocation(Long bookId);
+    
+    public List<BookDto> getDtoList2(String bookName);
+    
+    public List<Long> getIdLikeName(String name); //根据字符串查找书籍
 }

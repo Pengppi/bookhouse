@@ -13,14 +13,11 @@ import java.time.LocalDateTime;
 public class Code {
 
     //BigDecimal
-    @TableId(type = IdType.AUTO)
-    private Long codeId;
+    private String codeId;
 
     private Long bookId;
 
     private Integer codeType;
-
-    private String codeContent;
 
     private LocalDateTime codeStart;
 

@@ -6,5 +6,5 @@ import com.neo.bookhouse.entity.Booktag;
 import java.util.List;
 
 public interface BookTagService extends IService<Booktag> {
-    public List<String> getIsbnByTag(Integer tag);
+    public List<String> getIsbnByTag(Integer tag); //根据标签查找书籍
 }
