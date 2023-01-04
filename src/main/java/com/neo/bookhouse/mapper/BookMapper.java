@@ -16,8 +16,10 @@ import java.util.List;
 @Mapper
 public interface BookMapper extends BaseMapper<Book> {
 
-    List<BookDto> getDtoList(Integer bookKind);//按标签查找
+    List<BookDto> getDtoListByPage(Integer bookKind,int offset,int pageSize);//按标签查找
     
     List<BookDto> getDtoList2(String bookName);//按书名查找
+
+    int countDtoList(Integer bookKind);
 
 }
