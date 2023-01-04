@@ -273,7 +273,7 @@ public class BookController {
     }
 
     @GetMapping("/listByName/{userId}/{bookName}/{page}/{pageSize}")//通过字符串查找书名，参数为借书者的id,查找的书名,页号和页面大小
-    public R<Page> getBookByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page, @PathVariable int pageSize) {
+    public R<Page> getListByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page, @PathVariable int pageSize) {
         //分页构造器
         Page<Book> pageBuilder = new Page<>(page, pageSize);
         List<Long> ids = bookService.getIdLikeName(bookName);
@@ -322,6 +322,26 @@ public class BookController {
         dtoPage.setPages((total + pageSize - 1) / pageSize);
 
         return R.success(dtoPage);
+    }
+    
+    @GetMapping("/listById/{bookId}")//通过书籍ID查询书籍信息
+    public R<Book> getBookById(@PathVariable Long bookId)
+    {
+    	LambdaQueryWrapper<Book>wrapper = new LambdaQueryWrapper<>();
+    	wrapper.eq(Book::getBookId, bookId);
+    	
+    	Book book = bookService.getOne(wrapper);
+    	return book == null? R.error("该书籍不存在") : R.success(book);
+    }
+    
+    @GetMapping("/listRandom/{userId}/{page}/{pageSize}")//随机查询书籍，根据用户距离来推荐书籍
+    public R<Page> getListRandom(@PathVariable Long userId, @PathVariable int page, @PathVariable int pageSize)
+    {
+        Page<Book> pageBuilder = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Book> queryWrapper = new LambdaQueryWrapper<>();
+        bookService.page(pageBuilder, queryWrapper);
+
+        return R.success(getBookDtoByPage(userId, page, pageBuilder));
     }
 
 }
