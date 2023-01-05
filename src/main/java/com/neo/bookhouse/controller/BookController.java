@@ -220,13 +220,6 @@ public class BookController {
         return R.error("修改失败");
     }
 
-    @PostMapping("/cover/{id}")//上传书籍封面("bookId")
-    public R<Book> getBookByBookId(@PathVariable Long id) {
-        LambdaQueryWrapper<Book> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Book::getBookId, id);
-        return R.success(bookService.getOne(queryWrapper));
-    }
-
     @GetMapping("/findAll/{id}")//查询书屋的信息("userId")
     public R<List<Book>> getBookByUserId(@PathVariable Long id)//路径变量
     {
