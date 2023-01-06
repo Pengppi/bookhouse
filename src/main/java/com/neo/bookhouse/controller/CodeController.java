@@ -132,7 +132,11 @@ public class CodeController {
 		        Book book = bookService.getOne(new LambdaQueryWrapper<Book>().eq(Book::getBookId, bookId));
 		        if(book == null)
 		        return "该书不存在，借书失败";
-		        
+
+				if (userId.equals(book.getUserId())) {
+					return "不能借自己的书，借书失败";
+				}
+
 		        Integer bookState = book.getBookBorrow();
 		        if(bookState == 1)//书正在被借中,保证了只有一条借书记录是正在借书中
 		        return "该书被借走，借书失败";
