@@ -64,6 +64,7 @@ public class BorrowController {
             Book book = bookService.getOne(wrapper);
             if(book != null)
             {
+            borrowDto.setBookId(book.getBookId());
             borrowDto.setBookAuthor(book.getBookAuthor());
             //borrowDto.setBookBorrow(book.getBookBorrow());//根据现在书的情况
             borrowDto.setBookName(book.getBookName());
@@ -100,6 +101,7 @@ public class BorrowController {
             if(book != null)
             {
             borrowDto.setBookAuthor(book.getBookAuthor());
+            borrowDto.setBookId(book.getBookId());
             //borrowDto.setBookBorrow(book.getBookBorrow());//根据现在书的情况
             borrowDto.setBookName(book.getBookName());
             borrowDto.setBorrowDate(borrow.getBorrowDate());

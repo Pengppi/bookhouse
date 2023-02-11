@@ -229,7 +229,7 @@ public class BookController {
     }
 
     //地理位置排序函数
-    public Page<BookDto> getBookDtoByPage(Long userId, int page, Page<Book> pageBuilder) {
+    public Page<BookDto> getBookDtoByPage(Double longitude, Double latitude, int page, Page<Book> pageBuilder) {
         Page<BookDto> dtoPage = new Page<>();
         BeanUtils.copyProperties(pageBuilder, dtoPage, "records");
 
@@ -245,28 +245,21 @@ public class BookController {
             return bookDto;
         }).collect(Collectors.toList());
 
-        User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserId, userId));
-
-
-        if (user != null) {
-            Double longtitude = user.getUserLongitude(); //获取用户经度
-            Double latitude = user.getUserLatitude(); //获取用户纬度
-            if (longtitude != null && latitude != null)//经度和纬度都存在时候才能排序。
+            if (longitude != null && latitude != null)//经度和纬度都存在时候才能排序。
             {
                 bookDtos.sort((o1, o2) -> {
-                    Double dist1 = Math.sqrt(Math.pow(o1.getUserLongitude() - longtitude, 2) + Math.pow(o1.getUserLatitude() - latitude, 2));
-                    Double dist2 = Math.sqrt(Math.pow(o2.getUserLongitude() - longtitude, 2) + Math.pow(o2.getUserLatitude() - latitude, 2));
+                    Double dist1 = Math.sqrt(Math.pow(o1.getUserLongitude() - longitude, 2) + Math.pow(o1.getUserLatitude() - latitude, 2));
+                    Double dist2 = Math.sqrt(Math.pow(o2.getUserLongitude() - longitude, 2) + Math.pow(o2.getUserLatitude() - latitude, 2));
                     return dist1.compareTo(dist2);
                 });
             }
-        }
 
         dtoPage.setRecords(bookDtos);
         return dtoPage;
     }
 
-    @GetMapping("/listByName/{userId}/{bookName}/{page}/{pageSize}")//通过字符串查找书名，参数为借书者的id,查找的书名,页号和页面大小
-    public R<Page> getListByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page, @PathVariable int pageSize) {
+    @GetMapping("/listByName/{userId}/{bookName}/{page}/{pageSize}/{longitude}/{latitude}")//通过字符串查找书名，参数为借书者的id,查找的书名,页号，页面大小，用户经度和用户纬度
+    public R<Page> getListByName(@PathVariable Long userId, @PathVariable String bookName, @PathVariable int page, @PathVariable int pageSize, @PathVariable Double longitude, @PathVariable Double latitude) {
         //分页构造器
         Page<Book> pageBuilder = new Page<>(page, pageSize);
         List<Long> ids = bookService.getIdLikeName(bookName);
@@ -274,11 +267,11 @@ public class BookController {
         queryWrapper.in(Book::getBookId, ids);
         bookService.page(pageBuilder, queryWrapper);
 
-        return R.success(getBookDtoByPage(userId, page, pageBuilder));
+        return R.success(getBookDtoByPage(longitude, latitude, page, pageBuilder));
     }
 
-    @GetMapping("/findByTag/{userId}/{bookTag}/{page}/{pageSize}")//通过书籍标签查找书名,参数为借书者的ID,标签,页号和页面大小
-    public R<Page> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page, @PathVariable int pageSize) {
+    @GetMapping("/findByTag/{userId}/{bookTag}/{page}/{pageSize}/{longitude}/{latitude}")//通过书籍标签查找书名,参数为借书者的ID,标签,页号，页面大小，用户经度和用户纬度
+    public R<Page> getBookByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page, @PathVariable int pageSize,  @PathVariable Double longitude, @PathVariable Double latitude) {
 
         List<String> isbnList = bookTagService.getIsbnByTag(bookTag);
         Page<Book> pageBuilder = new Page<>(page, pageSize);
@@ -286,18 +279,18 @@ public class BookController {
         queryWrapper.in(Book::getBookIsbn, isbnList);
         bookService.page(pageBuilder, queryWrapper);
 
-        return R.success(getBookDtoByPage(userId, page, pageBuilder));
+        return R.success(getBookDtoByPage(longitude, latitude, page, pageBuilder));
     }
 
-    @GetMapping("/listByTag/{userId}/{bookTag}/{page}/{pageSize}/{longtitude}/{latitude}")//通过书籍标签查找书名,参数为借书者的ID,标签和页号
-    public R<Page> getListByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page, @PathVariable int pageSize, @PathVariable Double longtitude, @PathVariable Double latitude) {
+    @GetMapping("/listByTag/{userId}/{bookTag}/{page}/{pageSize}/{longitude}/{latitude}")//通过书籍标签查找书名,参数为借书者的ID,标签，页号，页面大小，用户经度和用户纬度
+    public R<Page> getListByTag(@PathVariable Long userId, @PathVariable Integer bookTag, @PathVariable int page, @PathVariable int pageSize, @PathVariable Double longitude, @PathVariable Double latitude) {
         List<BookDto> dtoList = bookService.getDtoListByPage(bookTag, page, pageSize);
         int total = bookService.countDtoList(bookTag);
-        if (longtitude != null && latitude != null)//经度和纬度都存在时候才能排序。
+        if (longitude != null && latitude != null)//经度和纬度都存在时候才能排序。
         {
             dtoList.sort((o1, o2) -> {
-                Double dist1 = Math.sqrt(Math.pow(o1.getUserLongitude() - longtitude, 2) + Math.pow(o1.getUserLatitude() - latitude, 2));
-                Double dist2 = Math.sqrt(Math.pow(o2.getUserLongitude() - longtitude, 2) + Math.pow(o2.getUserLatitude() - latitude, 2));
+                Double dist1 = Math.sqrt(Math.pow(o1.getUserLongitude() - longitude, 2) + Math.pow(o1.getUserLatitude() - latitude, 2));
+                Double dist2 = Math.sqrt(Math.pow(o2.getUserLongitude() - longitude, 2) + Math.pow(o2.getUserLatitude() - latitude, 2));
                 return dist1.compareTo(dist2);
             });
         }
@@ -321,13 +314,13 @@ public class BookController {
         return book == null ? R.error("该书籍不存在") : R.success(book);
     }
 
-    @GetMapping("/listRandom/{userId}/{page}/{pageSize}")//随机查询书籍，根据用户距离来推荐书籍
-    public R<Page> getListRandom(@PathVariable Long userId, @PathVariable int page, @PathVariable int pageSize) {
+    @GetMapping("/listRandom/{userId}/{page}/{pageSize}/{longitude}/{latitude}")//随机查询书籍，根据用户距离来推荐书籍。参数为借书者的ID,页号，页面大小，用户经度和用户纬度
+    public R<Page> getListRandom(@PathVariable Long userId, @PathVariable int page, @PathVariable int pageSize,  @PathVariable Double longitude, @PathVariable Double latitude) {
         Page<Book> pageBuilder = new Page<>(page, pageSize);
         LambdaQueryWrapper<Book> queryWrapper = new LambdaQueryWrapper<>();
         bookService.page(pageBuilder, queryWrapper);
 
-        return R.success(getBookDtoByPage(userId, page, pageBuilder));
+        return R.success(getBookDtoByPage(longitude, latitude, page, pageBuilder));
     }
 
 }

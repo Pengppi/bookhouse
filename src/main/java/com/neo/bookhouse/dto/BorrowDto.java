@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class BorrowDto {
 	
+	private Long bookId;//书的ID，用于检验还书码
+	
     private String bookName;//书名
     
     private String bookAuthor;//书的作者
