@@ -19,7 +19,6 @@ import java.util.List;
 @Slf4j
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurationSupport {
-
     /**
      * 扩展mvc框架的消息转换器
      *
