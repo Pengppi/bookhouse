@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8088
 spring:
   datasource:
     druid:
@@ -12,8 +12,18 @@ spring:
     username: peng8persevering@vip.qq.com
     password: bnljigdxnthuccda
     default-encoding: UTF-8
+    port: 465
+    properties:
+      mail:
+        smtp:
+          socketFactort:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+          ssl:
+            enable: true
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
 bookhouse:
   imgPath: \src\main\resources\static\img\
+  #imgPath: /usr/local/img/
 

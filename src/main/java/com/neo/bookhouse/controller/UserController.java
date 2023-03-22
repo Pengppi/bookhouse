@@ -47,7 +47,7 @@ public class UserController {
             return R.error("邮箱格式错误");
         }
         String code = ValidateCodeUtils.generateValidateCode(4).toString();
-        //sendMailService.sendLoginCode(mail, code);
+        sendMailService.sendLoginCode(mail, code);
         log.info("验证码{}发送成功", code);
         return R.success(code);
     }

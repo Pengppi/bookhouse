@@ -2,10 +2,7 @@ package com.neo.bookhouse;
 
 import com.neo.bookhouse.dto.BookDto;
 import com.neo.bookhouse.mapper.BookMapper;
-import com.neo.bookhouse.service.BookService;
-import com.neo.bookhouse.service.BookTagService;
-import com.neo.bookhouse.service.ContactService;
-import com.neo.bookhouse.service.UserService;
+import com.neo.bookhouse.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +29,13 @@ class BookHouseApplicationTests {
     @Autowired
     BookMapper bookMapper;
 
-    @Test
-    void testPage() {
-        List<BookDto> list = bookService.getDtoListByPage(1, 3, 5);
-        log.info(list.size() + "");
-    }
+    @Autowired
+    SendMailService sendMailService;
 
     @Test
-    void count() {
-        log.info("count: {}", bookMapper.countDtoList(1));
+    void test() {
+
     }
+
+
 }
