@@ -26,7 +26,7 @@ import java.util.UUID;
 public class FileController {
 
     @Value("${bookhouse.imgPath}")
-    private String imgPath;
+    private String path;
 
     @PostMapping("/upload")
     public R<String> upload(MultipartFile file) {
@@ -37,7 +37,6 @@ public class FileController {
         String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
         //使用UUID重新生成文件名，防止文件名称重复造成文件覆盖
         String fileName = UUID.randomUUID().toString() + suffix;
-        String path = System.getProperty("user.dir") + imgPath;
         //创建一个目录对象
         File dir = new File(path);
         //判断当前目录是否存在
@@ -58,7 +57,6 @@ public class FileController {
     public void download(@PathVariable String fileName, HttpServletResponse response) {
         try {
             //输入流，通过输入流读取文件内容
-            String path = System.getProperty("user.dir") + imgPath;
             FileInputStream fileInputStream = new FileInputStream(new File(path + fileName));
             //输出流，通过输出流将文件写回浏览器，在浏览器展示图片
             ServletOutputStream outputStream = response.getOutputStream();

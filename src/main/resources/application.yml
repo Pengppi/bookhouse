@@ -24,6 +24,6 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
 bookhouse:
-  imgPath: \src\main\resources\static\img\
+  imgPath: D:\IDEAWorkspace\book_house\src\main\resources\static\img\
   #imgPath: /usr/local/img/
 
