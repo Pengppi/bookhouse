@@ -50,7 +50,7 @@ public class FileController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return R.success(fileName);
+        return R.success("/api/file/download/" + fileName);
     }
 
     @GetMapping("/download/{fileName}")

@@ -4,7 +4,7 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/bookhouse?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://172.66.0.66:3306/bookhouse?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password: abc123
   mail:
@@ -24,6 +24,6 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
 bookhouse:
-#  imgPath: D:\IDEAWorkspace\book_house\src\main\resources\static\img\
-  imgPath: /usr/local/img/
+  imgPath: D:\IDEAWorkspace\book_house\src\main\resources\static\img\
+#  imgPath: /usr/local/img/
 
